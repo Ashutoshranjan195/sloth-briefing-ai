@@ -5,10 +5,15 @@ description = "Standalone offline repository evidence scanner with local open-we
 requires-python = ">=3.12"
 readme = "README.md"
 license = {file = "LICENSE"}
-dependencies = []
+dependencies = [
+    "fastapi>=0.115,<1",
+    "uvicorn[standard]>=0.30,<1",
+    "httpx2>=2.13,<3",
+]
 
 [project.scripts]
 sloth-briefing-ai = "sloth_briefing_ai.cli:main"
+sloth-briefing-server = "sloth_briefing_ai.api:run"
 
 [build-system]
 requires = ["setuptools>=68"]
@@ -16,3 +21,11 @@ build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[dependency-groups]
+dev = [
+    "pytest>=8,<9",
+]
+
+[tool.uv]
+default-groups = ["dev"]

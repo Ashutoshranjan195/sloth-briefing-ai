@@ -127,3 +127,26 @@ def chat_json(*, system_prompt: str, user_prompt: str, endpoint: str | None = No
     except (UnicodeDecodeError, json.JSONDecodeError) as exc:
         raise LocalAIResponseError("The local model endpoint returned invalid JSON.") from exc
     return _json_from_content(_extract_content(response_data))
+
+
+def test_connection(*, endpoint: str | None = None, model: str | None = None, timeout: float | None = None) -> dict[str, object]:
+    """Check the local OpenAI-compatible model catalog without sending repository data."""
+
+    config = LocalAIConfig.from_environment(endpoint=endpoint, model=model, timeout=timeout)
+    _validate_config(config)
+    models_endpoint = config.endpoint.replace("/v1/chat/completions", "/v1/models")
+    request = Request(models_endpoint, headers={"Accept": "application/json"}, method="GET")
+    try:
+        with urlopen(request, timeout=config.timeout) as response:
+            payload = json.loads(response.read().decode("utf-8"))
+    except HTTPError as exc:
+        if exc.code in {404, 408, 502, 503, 504}:
+            raise LocalAIUnavailable("The local model endpoint is unavailable.") from exc
+        raise LocalAIError(f"The local model endpoint returned HTTP {exc.code}.") from exc
+    except (TimeoutError, URLError, OSError) as exc:
+        raise LocalAIUnavailable("Could not reach the local model endpoint.") from exc
+    except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+        raise LocalAIResponseError("The local model catalog returned invalid JSON.") from exc
+    models = payload.get("data", []) if isinstance(payload, dict) else []
+    names = [str(item.get("id")) for item in models if isinstance(item, dict) and item.get("id")]
+    return {"reachable": True, "model": config.model, "modelAvailable": config.model in names, "models": names[:50]}

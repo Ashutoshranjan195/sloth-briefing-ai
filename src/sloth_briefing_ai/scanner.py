@@ -39,6 +39,7 @@ EXCLUDED_PARTS = {
     "dist",
     "node_modules",
     "venv",
+    ".sloth-data",
 }
 
 

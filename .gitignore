@@ -11,3 +11,4 @@ models/
 dist/
 build/
 *.egg-info/
+.sloth-data/

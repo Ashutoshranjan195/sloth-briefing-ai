@@ -85,6 +85,14 @@ class StandaloneTests(unittest.TestCase):
                 "actions": [{"check_id": "unknown", "action": "Do it", "why": "Because", "effort": "low"}],
             }, checks)
 
+    def test_generated_runtime_state_is_not_scanned_as_repository_evidence(self):
+        root = self.make_repo()
+        runtime_state = root / ".sloth-data"
+        runtime_state.mkdir()
+        (runtime_state / "history.json").write_text('{"repository": "C:\\\\Users\\\\someone\\\\repo"}\n')
+        absolute_path_check = next(check for check in audit(root) if check.id == "absolute_paths")
+        self.assertEqual(absolute_path_check.status, "PASS")
+
 
 if __name__ == "__main__":
     unittest.main()
