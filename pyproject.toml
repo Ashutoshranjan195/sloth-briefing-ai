@@ -1,0 +1,18 @@
+[project]
+name = "sloth-briefing-ai"
+version = "0.1.0"
+description = "Standalone offline repository evidence scanner with local open-weight AI briefings"
+requires-python = ">=3.12"
+readme = "README.md"
+license = {file = "LICENSE"}
+dependencies = []
+
+[project.scripts]
+sloth-briefing-ai = "sloth_briefing_ai.cli:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["src"]
